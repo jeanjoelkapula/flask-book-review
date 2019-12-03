@@ -1,14 +1,19 @@
 window.onscroll = function() {myFunction()};
 
 var navbar = document.getElementById("mainNav");
-var errormessages = $('.error-message');
-
+var popup = document.getElementById("popup-container");
 
 // Get the offset position of the navbar
 var sticky = navbar.offsetTop;
 
 $( document ).ready(function() {
   $('.error-message').each(function(i, obj) {
+      obj.style.display = 'none';
+  });
+});
+
+$( document ).ready(function() {
+  $('#toggle-button').each(function(i, obj) {
       obj.style.display = 'none';
   });
 
