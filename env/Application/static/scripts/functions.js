@@ -1,5 +1,7 @@
 var xhttp = new XMLHttpRequest();
 
+
+
 function signup () {
     var isformvalid = true;
     var data = new FormData();
@@ -51,6 +53,10 @@ function signup () {
                     document.getElementById('password-field').value = '';
                     document.getElementById('confirm-password-field').value = '';
                     $('#toggle-button').click();
+                    $("#ignismyModal").on('hidden.bs.modal', function(){
+                        window.location.href = "/login";
+                    });
+                    //window.location.href= '/login';
                 }
 
                 if (this.readyState == 4 && this.status == 500) {

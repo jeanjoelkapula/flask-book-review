@@ -104,10 +104,7 @@ def book(bookid):
         else:
             goodreads_average_rating = float(details["average_rating"])
 
-        if ((onsite_average_rating != 0) and (goodreads_average_rating != 0)):
-            average_rating = round (((onsite_average_rating + goodreads_average_rating) / 2), 1)
-        elif ((onsite_average_rating == 0) or (goodreads_average_rating == 0)):
-            average_rating = round ((onsite_average_rating + goodreads_average_rating), 1)
+        print(onsite_average_rating)
         return render_template('book.html', book = book, reviews = reviews, average_rating = onsite_average_rating, goodreads_reviews = details["work_reviews_count"], goodreads_rating=details["average_rating"]) 
     return redirect(url_for('login'))
 
@@ -158,16 +155,8 @@ def get_search_result(search, page):
             if details is None:
                 goodreads_average_rating = 0
             else:
-                goodreads_average_rating = float(details["average_rating"])
-
-            if ((onsite_average_rating != 0) and (goodreads_average_rating != 0)):
-                average_rating = round (((onsite_average_rating + goodreads_average_rating) / 2), 1)
-            elif ((onsite_average_rating == 0) or (goodreads_average_rating == 0)):
-                average_rating = round ((onsite_average_rating + goodreads_average_rating), 1)
-            mod = (goodreads_average_rating * 10) % 10
-            
-            ratings.append(average_rating)
-            #if rating is not None:
+                goodreads_average_rating = float(details["average_rating"])        
+            ratings.append(onsite_average_rating)
         pagination = paginate(page_count, 1)
     else:
         books = []
@@ -213,7 +202,7 @@ def get_onsite_average_rating(bookid):
     stars_3 = stars.stars_3
     stars_4 = stars.stars_4
     stars_5 = stars.stars_5
-    sum_result = (stars_1 + stars_2 + stars_3 + stars_4 + stars_4)
+    sum_result = (stars_1 + stars_2 + stars_3 + stars_4 + stars_5)
     if (sum_result != 0):
         onsite_average_rating = ((5 * stars_5) + (4 * stars_4) + (3 * stars_3) + (2 * stars_2) + (1 * stars_1)) / (stars_1 + stars_2 + stars_3 + stars_4 + stars_5)
     else:
@@ -250,7 +239,7 @@ def paginate(n, page):
     return pagination
 
 
-app.secret_key = os.getenv("SECRET_KEY")
+app.secret_key = r"b'\xc7\xba\xde>?\x1e\xfd\x10\xc7\xf6\xf0\x11?\xec\xd2S\x9b\xe9\xaby{\x19\xbe-'"#os.getenv("SECRET_KEY")
 if __name__ == "__main__":
     app.run()
 
