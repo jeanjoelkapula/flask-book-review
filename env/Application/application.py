@@ -1,6 +1,6 @@
 import os
 import requests
-import json
+import json, time
 from flask import Flask, render_template, request, jsonify, make_response, session, redirect, escape, url_for
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -20,57 +20,37 @@ def login():
 
 @app.route('/index/<int:page>')
 def index(page):
-    if 'username' in session:
-        
+    if 'username' in session: 
+        index_start = time.time()
         ratings = []
+        offset = (page * 15) -15
         book_count = db.execute("SELECT COUNT(*) FROM book;").first()[0]
         db.commit()
-        page_count = book_count / 15 
-        if type(page_count) == float:
-            page_count = int(page_count)
-        books = db.execute("SELECT * FROM book LIMIT 15 OFFSET :page", {"page":page}).fetchall()
+        if (book_count % 15) == 0:
+            page_count = book_count / 15 
+        else:
+            page_count = int(book_count /15) + 1
+        books = db.execute("SELECT * FROM book LIMIT 15 OFFSET :offset", {"offset":offset}).fetchall()
         for book in books:
-            stars = db.execute("SELECT COUNT(r1.rating) as stars_1, COUNT(r2.rating) as stars_2, COUNT(r3.rating) as stars_3, COUNT(r4.rating) stars_4, COUNT(r5.rating) as stars_5 FROM review r1 " + 
-                    "LEFT OUTER JOIN review r2 ON r1.reviewid = r2.reviewid " + 
-                    "LEFT OUTER JOIN review r3 ON r1.reviewid = r3.reviewid " + 
-                    "LEFT OUTER JOIN review r4 ON r1.reviewid = r4.reviewid " + 
-                    "LEFT OUTER JOIN review r5 ON r1.reviewid = r5.reviewid " + 
-                    "WHERE r1.bookid = 2 AND " + 
-                    "r1.rating = 1 AND " + 
-                    "r2.rating = 2 AND " + 
-                    "r3.rating = 4 AND " + 
-                    "r4.rating = 4 AND " + 
-                    "r5.rating = 5;").first()
-            stars_1 = stars.stars_1
-            stars_2 = stars.stars_2
-            stars_3 = stars.stars_3
-            stars_4 = stars.stars_4
-            stars_5 = stars.stars_5
-
-            sum_result = (stars_1 + stars_2 + stars_3 + stars_4 + stars_4)
-            if (sum_result != 0):
-                onsite_average_rating = ((5 * stars_5) + (4 * stars_4) + (3 * stars_3) + (2 * stars_2) + (1 * stars_1)) / (stars_1 + stars_2 + stars_3 + stars_4 + stars_4)
-            else:
-                onsite_average_rating = 0
-
-            res = requests.get ('https://www.goodreads.com/book/review_counts.json', params = {"key":"bS9TJpeOW8gIGXR4CM9NFA", "isbns":book.isbn})
-            if res.status_code == 200:
-                goodreads_average_rating = float(res.json()["books"][0]["average_rating"])
-            else:
+            onsite_average_rating = get_onsite_average_rating(book.bookid)
+            '''details = get_goodreads_book_details(book.isbn)
+            if details is None:
                 goodreads_average_rating = 0
+            else:
+                goodreads_average_rating = float(details["average_rating"])
 
             if ((onsite_average_rating != 0) and (goodreads_average_rating != 0)):
                 average_rating = round (((onsite_average_rating + goodreads_average_rating) / 2), 1)
             elif ((onsite_average_rating == 0) or (goodreads_average_rating == 0)):
                 average_rating = round ((onsite_average_rating + goodreads_average_rating), 1)
-            mod = (goodreads_average_rating * 10) % 10
-            print(f'ON SITE: {onsite_average_rating}  GOOD READS: {goodreads_average_rating} MOD: {mod}')
-
+            mod = (goodreads_average_rating * 10) % 10'''
             
-            ratings.append(average_rating)
+            ratings.append(onsite_average_rating)
             #if rating is not None:
         pagination = paginate(page_count, page)
-        return render_template('index.html', books = books, ratings = ratings, current_page = page, pagination = pagination, page_count = page_count)
+        index_end = time.time()
+        print('index duration', (index_end - index_start))
+        return render_template('index.html', books = books, ratings = ratings, current_page = page, pagination = pagination, page_count = page_count, isSearch = False)
     return redirect(url_for('login'))
 
 @app.route("/signup")
@@ -86,13 +66,12 @@ def user_create():
 
     exists = db.execute ("SELECT * FROM useraccount WHERE username = :username", {"username":username}).first()
     db.commit()
-    print(exists)
     if exists:
         return make_response(jsonify({'message':'This username is already taken'}), 500)
     else:
         db.execute("INSERT INTO useraccount (firstname, lastname, username, password) VALUES (:firstname, :lastname, :username, :password)",
                   {"firstname":firstname, "lastname":lastname, "username":username, "password":password})
-        db.commit()
+        db.commit() 
         return make_response(jsonify({'message':'Your account has been created'}), 200)
 
 @app.route("/user_login", methods = ["POST"])
@@ -100,7 +79,6 @@ def user_login():
     username = request.form.get("username")
     password = request.form.get("password")
 
-    print(username + password)
     exists = db.execute("SELECT * FROM useraccount WHERE username = :username AND password = :password", {"username":username, "password":password}).first()
 
     if exists:  
@@ -113,6 +91,99 @@ def user_login():
     else:
         return make_response(jsonify({'message':'Incorrect credentials'}), 500)
 
+@app.route('/book/<int:bookid>')
+def book(bookid):
+    if 'username' in session:   
+        book = db.execute("SELECT * FROM book WHERE bookid = :bookid", {"bookid":bookid}).first()
+        db.commit()
+        reviews = db.execute("SELECT A.firstname, A.lastname, R.rating, R.review FROM review R INNER JOIN useraccount A ON R.userid = A.userid WHERE bookid = :bookid;", {"bookid":bookid}).fetchall()
+        db.commit()
+        onsite_average_rating = get_onsite_average_rating(bookid)
+        details = get_goodreads_book_details(book.isbn)
+        print(onsite_average_rating)
+        if details is None:
+            goodreads_average_rating = 0
+        else:
+            goodreads_average_rating = float(details["average_rating"])
+
+        if ((onsite_average_rating != 0) and (goodreads_average_rating != 0)):
+            average_rating = round (((onsite_average_rating + goodreads_average_rating) / 2), 1)
+        elif ((onsite_average_rating == 0) or (goodreads_average_rating == 0)):
+            average_rating = round ((onsite_average_rating + goodreads_average_rating), 1)
+        print(f'onsite: {onsite_average_rating} goodreads:{goodreads_average_rating}')
+        return render_template('book.html', book = book, reviews = reviews, average_rating = onsite_average_rating, goodreads_reviews = details["work_reviews_count"], goodreads_rating=details["average_rating"]) 
+    return redirect(url_for('login'))
+
+@app.route('/review', methods = ["POST"])
+def review():
+    bookid = request.form.get('bookid')
+    rating = int(request.form.get('rating'))
+    review = request.form.get('review')
+
+    exists = db.execute('SELECT COUNT(*) FROM review where userid = :userid AND bookid = :bookid', {"userid": session['userid'], "bookid":bookid}).first()[0]
+    if exists == 0:
+        db.execute('INSERT INTO review (bookid, userid, rating, review) VALUES (:bookid, :userid, :rating, :review);', {"bookid":bookid, "userid":session["userid"], "rating":rating, "review":review})
+        db.commit()
+        #return render_template('review.html', firstname = session["firstname"], lastname = session["lastname"], rating = rating, review = review) 
+        return make_response(jsonify({'message': 'review submission successful', 'path':'/book/' + bookid}),200)
+    else:
+        return make_response(jsonify({'message': 'You may only submit one review per book'}), 500)
+
+@app.route('/search', methods = ["POST"])
+def search():
+    search = request.form.get('search-bar')
+    dictionary = get_search_result(search, 1)
+        
+    return render_template('index.html', books = dictionary['books'], ratings = dictionary['ratings'], current_page = 1, pagination = dictionary['pagination'], page_count = dictionary['page_count'], search = search, isSearch = True)
+
+@app.route('/search_result', methods = ["GET"])
+def search_result(search, page):
+    dictionary = get_search_result(search, page)
+
+    return render_template('index.html', books = dictionary['books'], ratings = dictionary['ratings'], current_page = 1, pagination = dictionary['pagination'], page_count = dictionary['page_count'], search = search, isSearch = True)
+def get_search_result(search, page):
+    ratings= []
+    dictionary = dict()
+    if (len(search.strip()) != 0):
+        search = '%' + search + '%'
+        offset = (page * 15) - 15
+        books = db.execute('SELECT * FROM book WHERE (isbn ILIKE :search) OR (author ILIKE :search) OR (title ILIKE :search) LIMIT 15 OFFSET :offset', {"search":search, "offset":offset}).fetchall() 
+        if (len(books) % 15) == 0:
+            page_count = len(books) / 15 
+        else:
+            page_count = (len(books) / 15) + 1
+        if type(page_count) == float:
+            page_count = int(page_count)
+
+        for book in books:
+            onsite_average_rating = get_onsite_average_rating(book.bookid)
+            details = get_goodreads_book_details(book.isbn)
+            if details is None:
+                goodreads_average_rating = 0
+            else:
+                goodreads_average_rating = float(details["average_rating"])
+
+            if ((onsite_average_rating != 0) and (goodreads_average_rating != 0)):
+                average_rating = round (((onsite_average_rating + goodreads_average_rating) / 2), 1)
+            elif ((onsite_average_rating == 0) or (goodreads_average_rating == 0)):
+                average_rating = round ((onsite_average_rating + goodreads_average_rating), 1)
+            mod = (goodreads_average_rating * 10) % 10
+            
+            ratings.append(average_rating)
+            #if rating is not None:
+        pagination = paginate(page_count, 1)
+    else:
+        books = []
+        page_count = 1
+        pagination = paginate(page_count, 1)
+    dictionary['books'] = books
+    dictionary['ratings'] = ratings
+    dictionary['page'] = page
+    dictionary['pagination'] = pagination
+    dictionary['page_count'] = page_count
+
+    return dictionary
+
 @app.route('/logout')
 def logout():
     session.pop('userid', None)
@@ -121,19 +192,44 @@ def logout():
     session.pop('username', None)
     return redirect(url_for('welcome'))
 
-@app.route('/book/<int:bookid>')
-def book(bookid):
-    return f'{bookid}'
 
-@app.route ('/api')
-def api():
-    res = requests.get ('https://www.goodreads.com/book/review_counts.json', params = {"key":"bS9TJpeOW8gIGXR4CM9NFA", "isbns":"9781632168146"})
-    #print(res.json()["books"][0]["average_rating"])
-    if res.status_code == 404:
-        print('The book was not found')
+@app.route ('/api/<isbn>')
+def api(isbn):
+    book = db.execute('SELECT * from book WHERE isbn = :isbn', {"isbn":isbn}).first()
+    db.commit()
+
+    if book is None:
+        return make_response(jsonify({'message': 'The book was not found'}), 404)
     else:
-        print(f'The type of rating is {type(float(res.json()["books"][0]["average_rating"]))}')
-    return res.text
+        return make_response(json.dumps(dict(book)), 200)
+
+def get_onsite_average_rating(bookid):
+    stars = db.execute("SELECT (SELECT COUNT (rating) from review WHERE bookid =4 and rating = 1) as stars_1," + 
+        "(SELECT COUNT (rating) from review WHERE bookid =:bookid and rating = 2) as stars_2," +
+        "(SELECT COUNT (rating) from review WHERE bookid =:bookid and rating = 3) as stars_3," + 
+        "(SELECT COUNT (rating) from review WHERE bookid =:bookid and rating = 4) as stars_4," + 
+        "(SELECT COUNT (rating) from review WHERE bookid =:bookid and rating = 5) as stars_5 " +
+        "FROM review Limit 1;", {"bookid":bookid}).first()
+                    
+    stars_1 = stars.stars_1
+    stars_2 = stars.stars_2
+    stars_3 = stars.stars_3
+    stars_4 = stars.stars_4
+    stars_5 = stars.stars_5
+    print(f'stars_1: {stars_1} stars_2:{stars_2} stars_3:{stars_3} stars_4:{stars_4} stars_5:{stars_5}')
+    sum_result = (stars_1 + stars_2 + stars_3 + stars_4 + stars_4)
+    if (sum_result != 0):
+        onsite_average_rating = ((5 * stars_5) + (4 * stars_4) + (3 * stars_3) + (2 * stars_2) + (1 * stars_1)) / (stars_1 + stars_2 + stars_3 + stars_4 + stars_5)
+    else:
+        onsite_average_rating = 0
+    return onsite_average_rating
+
+def get_goodreads_book_details(isbn):
+    res = requests.get ('https://www.goodreads.com/book/review_counts.json', params = {"key":"bS9TJpeOW8gIGXR4CM9NFA", "isbns":isbn})
+    if res.status_code == 200:
+        return res.json()["books"][0]
+    else:
+        return None 
 
 def paginate(n, page):
     assert(0 < n)

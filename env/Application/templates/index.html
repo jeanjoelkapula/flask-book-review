@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
-  <title>Home - Brand</title>
+  <title>Home</title>
   <link rel="stylesheet" href="bootstrap.min.css" />
   <link rel="stylesheet" href="../static/styles/style.css">
   <link rel="stylesheet" href="bootstrap.min.css" />
@@ -34,20 +34,24 @@
 
   <div class="container">
     <div class="row">
-      <div class="col-md-10 col-lg-8 mx-auto">
+      <div class="col-md-10 col-lg-8 mx-auto"> 
 
       </div>
     </div>
   </div>
 </header>
-<div class="book-search-section">
-  <div class="search-bar-div" data-validate="Username is required">
-    <input class="search-bar" type="text" name="search-bar" placeholder="Search book">
+<form action = "/search" method = "POST">
+  <div class="book-search-section">
+    <div class="search-bar-div" data-validate="Username is required">
+      <input id = "search-bar" class="search-bar" type="text" name="search-bar" placeholder="Search isbn \ title \ author">
+    </div>
+    <div class="search-button-div">
+      <button id="search-button"  type= "submit">
+        <img src="../static/images/search-icon.png" id="search-icon"> Search
+      </button>
+    </div>
   </div>
-  <div class="search-button-div">
-    <a class="btn btn-primary btn-xl rounded-pill " role="button" id="search-button" href="signup.html"><img src="../static/images/search-icon.png" id="search-icon"> Seach  </a>
-  </div>
-</div>
+</form>
 <div class = "pagination-top">
   <div> 
     <nav aria-label="...">
@@ -58,7 +62,11 @@
           </li>
         {% else %}
           <li class="page-item">
+            {% if isSearch == True %}
+              <span class="page-link"><a href = "{{url_for('search_result', page = current_page - 1, search= search)}}" >Previous</a></span>
+            {% else %}
               <span class="page-link"><a href = "{{url_for('index', page = current_page - 1)}}" >Previous</a></span>
+            {% endif %}
           </li>
         {% endif %}
         {% for item in pagination %}
@@ -72,12 +80,20 @@
           {% elif item == '...' %}
               <li class="page-item"><a class = "page-link" >{{item}}</a></li>
           {% else %}
-              <li class="page-item"><a class="page-link" href="{{url_for('index', page = item)}}">{{item}}</a></li>
+            {% if isSearch == True %}
+              <li class="page-item"><a class="page-link" href="{{url_for('search_result', page = item, search = search)}}">{{item}}</a></li>
+            {% else %}
+              <span class="page-link"><a href = "{{url_for('index', page = item)}}" >{{item}}</a></span>
+            {% endif %}
           {% endif %}
         {%endfor%}
         {% if current_page != page_count %}
           <li class="page-item">
-            <a class="page-link" href="{{url_for('index', page = current_page + 1)}}">Next</a>
+            {% if isSearch == True %}
+              <a class="page-link" href="{{url_for('search_result', page = current_page + 1, search = search)}}">Next</a>
+            {% else %}
+              <span class="page-link"><a href = "{{url_for('index', page = current_page + 1)}}" >Next</a></span>
+            {% endif %}
           </li>
         {% else %}
           <li class="page-item disabled">
@@ -100,7 +116,11 @@
         </div>
         <div class="index-average-rating">
           {% if ratings[loop.index0] == 0 %}
-             No rating
+             <img src="../static/images/norating-star.png">
+             <img src="../static/images/norating-star.png">
+             <img src="../static/images/norating-star.png">
+             <img src="../static/images/norating-star.png">
+             <img src="../static/images/norating-star.png">
           {% else %}
               {% for i in range (ratings[loop.index0]|int) %}
                 <i class="fas fa-star"></i>
@@ -115,26 +135,34 @@
             <p>{{book.title}}</p>
           </div>
           <div class="book-autor-section">
-            <p>{{book.autor}}</p>
+            <p>{{book.author}}</p>
           </div>
         </div>
       </div>
     </a>
-    {% set index = index + 1 %}
+  {% set index = index + 1 %}
+  {% else %}
+    <div class = "noresult-section">
+      <p>No result has been found</p>
+    </div>
   {% endfor %}
   </div>
 </div>
 <div class = "pagination-bottom"> 
-  <div>
+  <div> 
     <nav aria-label="...">
-         <ul class="pagination">
+        <ul class="pagination">
         {% if current_page - 1 == 0 %}
           <li class="page-item disabled">
               <span class="page-link">Previous</span>
           </li>
         {% else %}
           <li class="page-item">
+            {% if isSearch == True %}
+              <span class="page-link"><a href = "{{url_for('search_result', page = current_page - 1, search= search)}}" >Previous</a></span>
+            {% else %}
               <span class="page-link"><a href = "{{url_for('index', page = current_page - 1)}}" >Previous</a></span>
+            {% endif %}
           </li>
         {% endif %}
         {% for item in pagination %}
@@ -148,12 +176,20 @@
           {% elif item == '...' %}
               <li class="page-item"><a class = "page-link" >{{item}}</a></li>
           {% else %}
-              <li class="page-item"><a class="page-link" href="{{url_for('index', page = item)}}">{{item}}</a></li>
+            {% if isSearch == True %}
+              <li class="page-item"><a class="page-link" href="{{url_for('search_result', page = item, search = search)}}">{{item}}</a></li>
+            {% else %}
+              <span class="page-link"><a href = "{{url_for('index', page = item)}}" >{{item}}</a></span>
+            {% endif %}
           {% endif %}
         {%endfor%}
         {% if current_page != page_count %}
           <li class="page-item">
-            <a class="page-link" href="{{url_for('index', page = current_page + 1)}}">Next</a>
+            {% if isSearch == True %}
+              <a class="page-link" href="{{url_for('search_result', page = current_page + 1, search = search)}}">Next</a>
+            {% else %}
+              <span class="page-link"><a href = "{{url_for('index', page = current_page + 1)}}" >Next</a></span>
+            {% endif %}
           </li>
         {% else %}
           <li class="page-item disabled">
@@ -178,6 +214,7 @@
     </div>
   </div>
 </footer>
+<script type="text/javascript" src="../static/scripts/functions.js"></script>
 </body>
 
 </html>

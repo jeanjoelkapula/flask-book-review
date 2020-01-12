@@ -1,5 +1,8 @@
 $btn-primary-color: rgb(33, 37, 41);
 
+body {
+  padding-right: 0px;
+}
 #welcome-header {
   background-image: url('../images/book-saucer.jpg');
   background-size: cover;
@@ -216,11 +219,16 @@ label {
 
 
 .wrap-login100 {
-  width: 670px;
+  width: 100%;
   background: #fff;
   border-radius: 10px;
   overflow: hidden;
+  height: 680px;
   box-shadow:  0 15px 20px rgba(0, 0, 0, 0.3);
+}
+
+.wrap-login100 .login100-form-title {
+  height:5%;
 }
 
 /*==================================================================
@@ -240,7 +248,7 @@ label {
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
-  padding: 70px 15px 74px 15px;
+  padding: 50px 15px 69px 15px;;
 }
 
 .login100-form-title-1 {
@@ -277,7 +285,8 @@ label {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  padding: 43px 88px 93px 190px;
+  padding: 20px 15px 18px 15px;
+  margin-bottom: 20px;
 }
 
 
@@ -288,6 +297,7 @@ label {
   width: 100%;
   position: relative;
   border-bottom: 1px solid #b2b2b2;
+  margin-bottom: 19px;
 }
 
 .label-input100 {
@@ -439,11 +449,11 @@ input.input100 {
   justify-content: center;
   align-items: center;
   padding: 0 20px;
-  min-width: 160px;
-  height: 50px;
+  min-width: 116px;
+  height: 40px;
   background-color: $btn-primary-color;
   border-radius: 25px;
-  margin-top: 25px;
+  margin-top: 9px;
   font-family: Poppins-Regular;
   font-size: 16px;
   color: #fff;
@@ -462,6 +472,31 @@ input.input100 {
 
 /*------------------------------------------------------------------
 [ Responsive ]*/
+@media screen and (min-width: 768px) {
+  .wrap-login100 {
+    width: 670px;
+    height: 600px;
+  }
+
+  .login100-form {
+    padding: 43px 88px 93px 190px;
+  }
+  .wrap-login100 .login100-form-title {
+    height:144px;
+    padding: 50px 15px 69px 15px;
+  }
+
+  .wrap-input100 {
+    margin-bottom: 2px;
+  }
+
+  .login-button {
+    min-width: 160px;
+    margin-top: 25px;
+    height: 50px;
+
+  }
+}
 
 @media (max-width: 576px) {
   .login100-form {
@@ -485,65 +520,6 @@ input.input100 {
 }
 
 
-/*------------------------------------------------------------------
-[ Alert validate ]*/
-
-.validate-input {
-  position: relative;
-}
-
-.alert-validate::before {
-  content: attr(data-validate);
-  position: absolute;
-  max-width: 70%;
-  background-color: #fff;
-  border: 1px solid #c80000;
-  border-radius: 2px;
-  padding: 4px 25px 4px 10px;
-  top: 50%;
-  -webkit-transform: translateY(-50%);
-  -moz-transform: translateY(-50%);
-  -ms-transform: translateY(-50%);
-  -o-transform: translateY(-50%);
-  transform: translateY(-50%);
-  right: 2px;
-  pointer-events: none;
-
-  font-family: Poppins-Medium;
-  color: #c80000;
-  font-size: 13px;
-  line-height: 1.4;
-  text-align: left;
-
-  visibility: hidden;
-  opacity: 0;
-
-  -webkit-transition: opacity 0.4s;
-  -o-transition: opacity 0.4s;
-  -moz-transition: opacity 0.4s;
-  transition: opacity 0.4s;
-}
-
-.alert-validate::after {
-  content: "\f06a";
-  font-family: FontAwesome;
-  display: block;
-  position: absolute;
-  color: #c80000;
-  font-size: 15px;
-  top: 50%;
-  -webkit-transform: translateY(-50%);
-  -moz-transform: translateY(-50%);
-  -ms-transform: translateY(-50%);
-  -o-transform: translateY(-50%);
-  transform: translateY(-50%);
-  right: 8px;
-}
-
-.alert-validate:hover:before {
-  visibility: visible;
-  opacity: 1;
-}
 
 @media (max-width: 992px) {
   .alert-validate::before {
@@ -585,6 +561,7 @@ INDEX  PAGE
   border-radius: 2px;
   padding-left: 10px;
 }
+
 .search-button-div {
   height: 30px;
   margin-left: 10px;
@@ -592,8 +569,14 @@ INDEX  PAGE
 }
 
 #search-button {
-  @extend #signup-button;
+  @extend .login-button;
   padding:12px;
+  color: white;
+  margin-top: 0px;
+}
+
+#search-button img {
+  margin-right: 10px;
 }
 
 #search-icon {
@@ -601,6 +584,11 @@ INDEX  PAGE
   width: 20px;
 }
 
+.noresult-section p {
+  font-size: 25px;
+  margin-top: 60px;
+  margin-bottom: 60px;
+}
 
 .books-container a:hover {
   text-decoration: none;
@@ -616,9 +604,22 @@ INDEX  PAGE
 .book-list-section .books-container {
   display: flex;
   width: 100%;
-  background-color: white;
-  margin-left: 2%;
   flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  text-align:center;
+}
+
+.book-list-section .books-container a {
+  width: 240px;
+  justify-content: center;
+  align-items: center;
+  text-align:center;
+}
+
+
+.book-item {
+  margin-left: 0px;
 }
 
 @media screen and (min-width:547px) {
@@ -626,7 +627,6 @@ INDEX  PAGE
   margin-right: 20px;
   margin-bottom: 20px;
   margin-top: 8px;
-  width: 240px;
   height: auto;
   box-shadow:  0 15px 20px rgba(0, 0, 0, 0.3);
   }
@@ -634,6 +634,10 @@ INDEX  PAGE
 
 .index-average-rating i {
   color: rgb(255, 202, 40);
+}
+
+.index-average-rating img {
+  height: 25px;
 }
 .book-title-section {
   font-family: sans-serif;
@@ -656,7 +660,8 @@ INDEX  PAGE
 
 .book-autor-section p {
   text-decoration: none;
-  color:black;
+  color: rgb(172, 179, 180);
+  font-size: 14px;
 }
 .book-image-section img {
   width: 100px;
@@ -681,7 +686,7 @@ INDEX  PAGE
 	display:block;
 	margin-bottom:25px;
 }
-
+ 
 .thank-you-pop h1{
 	font-size: 42px;
     margin-bottom: 25px;
@@ -733,7 +738,7 @@ INDEX  PAGE
     width: 240px;
     height: auto;
     box-shadow:  0 15px 20px rgba(0, 0, 0, 0.3);
-    margin-left: 120px;
+    margin-left: 0px;
     height: auto;
   }
 }
@@ -747,13 +752,14 @@ BOOK PAGE
   width: 100%;
   margin-top: 60px;
   margin-bottom: 60px;
-  height:500px;
+  height:611px;
 }
 
 .book-information-section .information-container {
   width: 80%;
   margin:auto;
   height:100%;
+  padding-top: 14px;
   border-radius: 10px;
   box-shadow:  0 15px 20px rgba(0, 0, 0, 0.3);
 }
@@ -770,10 +776,12 @@ BOOK PAGE
   margin-bottom: 15px;
 }
 
-.rating-section img {
-  width: 40px;
-  height: 40px;
+.rating-section i {
+  font-size: 30px;
+  width: 50px;
+  height: 50px;
   margin-right: 10px;
+  color: rgb(255, 202, 40)
 }
 .book .book-image {
   @extend .book-image-section;
@@ -836,6 +844,10 @@ BOOK PAGE
   word-wrap: break-word;
 }
 
+.reviewer-rating {
+  color: rgb(255, 202, 40);
+  padding-top: 4px;
+}
 .rating-selection-section {
   display: flex;
   padding-left: 5%;

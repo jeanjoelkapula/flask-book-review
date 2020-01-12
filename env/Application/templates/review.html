@@ -1,0 +1,15 @@
+<div class="review-item">
+    <div class="review-header">
+    <div class="reviewer-name">
+        <p> {{ firstname }} {{ lastname }} </p>
+    </div>
+    <div class="reviewer-rating">
+    {% for star in range(rating) %}
+        <i class="fas fa-star"></i>
+    {% endfor %} 
+    </div>
+    </div>
+    <div class="reviewer-comment">
+    <p> {{review }} </p>
+    </div>
+</div>

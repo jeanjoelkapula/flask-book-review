@@ -52,22 +52,22 @@ function signup () {
                     document.getElementById('confirm-password-field').value = '';
                     $('#toggle-button').click();
                 }
-                
+
                 if (this.readyState == 4 && this.status == 500) {
                     username_error_paragraph.innerHTML = JSON.parse(this.responseText).message;
                     username_error_section.style.display = 'block';
                 }
-            };   
-            
+            };
+
             xhttp.open('POST', '/user_create', true);
             xhttp.send(data);
-            confirm_error_section.style.display = 'none';     
+            confirm_error_section.style.display = 'none';
         }
         else {
             password_error_paragraph.innerHTML = 'Password did not match';
             confirm_error_section.style.display = 'block';
         }
-        
+
     }
 }
 
@@ -93,4 +93,74 @@ function login() {
     }
     xhttp.open('POST', '/user_login', true);
     xhttp.send(data);
+}
+
+function submit_review () {
+    var div = document.createElement('div');
+    var review_section = document.getElementById('reviews');
+    var review = document.getElementById('comment-field').value.trim();
+    var bookid = document.getElementById('bookid').innerHTML;
+    var selected_stars = 0;
+    var stars = document.getElementsByClassName('selection-star');
+    for(var i = 0; i < stars.length; ++i) {
+        if (window.getComputedStyle(stars[i]).color == 'rgb(255, 202, 40)') {
+            selected_stars += 1;
+        }
+    }
+
+    if (selected_stars != 0) {
+        if (review != '') {
+        data = new FormData();
+        data.append('review', review);
+        data.append('bookid', bookid);
+        data.append('rating', selected_stars);
+
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                window.location.href = JSON.parse(this.responseText).path;
+            }
+            if(this.readyState == 4 && this.status == 500 ) {
+                alert(JSON.parse(this.responseText).message);
+            }
+        }
+
+        xhttp.open('POST', '/review', true);
+        xhttp.send(data);
+        }
+        else {
+            alert('please enter a comment');
+        }
+    }
+    else {
+        alert('Please select a star rating');
+    }
+
+}
+
+function search_book() {
+    alert('clicked');
+    var div = document.createElement('div');
+    var search_content = document.getElementById('search-bar').value.trim();
+    data = new FormData();
+    data.append("search", search_content);
+    if (search_content == '') {
+        alert('Please enter something to search');
+    }
+    else {
+
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                 div.innerHTML = this.responseText;
+                 console.log(this.responseText);
+                // review_section.appendChild(div);
+                // window.location.href = JSON.parse(this.responseText).path;
+            }
+            if(this.readyState == 4 && this.status != 200 ) {
+                alert(JSON.parse(this.responseText).message);
+            }
+        }
+        xhttp.open('POST', '/search', true);
+        xhttp.send(data);
+    }
+    return false;
 }

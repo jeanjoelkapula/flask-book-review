@@ -1,4 +1,8 @@
 @charset "UTF-8";
+body {
+  padding-right: 0px;
+}
+
 #welcome-header {
   background-image: url("../images/book-saucer.jpg");
   background-size: cover;
@@ -85,7 +89,7 @@
   font-size: 20px;
 }
 
-#signup-button, #search-button {
+#signup-button {
   background-color: #212529;
   border-color: #262626;
   padding-left: 25px;
@@ -230,11 +234,16 @@ label {
 }
 
 .wrap-login100 {
-  width: 670px;
+  width: 100%;
   background: #fff;
   border-radius: 10px;
   overflow: hidden;
+  height: 680px;
   box-shadow: 0 15px 20px rgba(0, 0, 0, 0.3);
+}
+
+.wrap-login100 .login100-form-title {
+  height: 5%;
 }
 
 /*==================================================================
@@ -254,7 +263,7 @@ label {
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
-  padding: 70px 15px 74px 15px;
+  padding: 50px 15px 69px 15px;
 }
 
 .login100-form-title-1 {
@@ -289,7 +298,8 @@ label {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  padding: 43px 88px 93px 190px;
+  padding: 20px 15px 18px 15px;
+  margin-bottom: 20px;
 }
 
 /*------------------------------------------------------------------
@@ -298,6 +308,7 @@ label {
   width: 100%;
   position: relative;
   border-bottom: 1px solid #b2b2b2;
+  margin-bottom: 19px;
 }
 
 .label-input100 {
@@ -420,7 +431,7 @@ input.input100 {
 
 /*------------------------------------------------------------------
 [ Button ]*/
-.login-button {
+.login-button, #search-button {
   width: 100%;
   display: -webkit-box;
   display: -webkit-flex;
@@ -430,7 +441,7 @@ input.input100 {
   flex-wrap: wrap;
 }
 
-.login-button {
+.login-button, #search-button {
   display: -webkit-box;
   display: -webkit-flex;
   display: -moz-box;
@@ -439,11 +450,11 @@ input.input100 {
   justify-content: center;
   align-items: center;
   padding: 0 20px;
-  min-width: 160px;
-  height: 50px;
+  min-width: 116px;
+  height: 40px;
   background-color: #212529;
   border-radius: 25px;
-  margin-top: 25px;
+  margin-top: 9px;
   font-family: Poppins-Regular;
   font-size: 16px;
   color: #fff;
@@ -454,12 +465,37 @@ input.input100 {
   transition: all 0.4s;
 }
 
-.login-button:hover {
+.login-button:hover, #search-button:hover {
   background-color: #333333;
 }
 
 /*------------------------------------------------------------------
 [ Responsive ]*/
+@media screen and (min-width: 768px) {
+  .wrap-login100 {
+    width: 670px;
+    height: 600px;
+  }
+
+  .login100-form {
+    padding: 43px 88px 93px 190px;
+  }
+
+  .wrap-login100 .login100-form-title {
+    height: 144px;
+    padding: 50px 15px 69px 15px;
+  }
+
+  .wrap-input100 {
+    margin-bottom: 2px;
+  }
+
+  .login-button, #search-button {
+    min-width: 160px;
+    margin-top: 25px;
+    height: 50px;
+  }
+}
 @media (max-width: 576px) {
   .login100-form {
     padding: 43px 15px 57px 117px;
@@ -479,62 +515,6 @@ input.input100 {
     padding: 0 5px;
   }
 }
-/*------------------------------------------------------------------
-[ Alert validate ]*/
-.validate-input {
-  position: relative;
-}
-
-.alert-validate::before {
-  content: attr(data-validate);
-  position: absolute;
-  max-width: 70%;
-  background-color: #fff;
-  border: 1px solid #c80000;
-  border-radius: 2px;
-  padding: 4px 25px 4px 10px;
-  top: 50%;
-  -webkit-transform: translateY(-50%);
-  -moz-transform: translateY(-50%);
-  -ms-transform: translateY(-50%);
-  -o-transform: translateY(-50%);
-  transform: translateY(-50%);
-  right: 2px;
-  pointer-events: none;
-  font-family: Poppins-Medium;
-  color: #c80000;
-  font-size: 13px;
-  line-height: 1.4;
-  text-align: left;
-  visibility: hidden;
-  opacity: 0;
-  -webkit-transition: opacity 0.4s;
-  -o-transition: opacity 0.4s;
-  -moz-transition: opacity 0.4s;
-  transition: opacity 0.4s;
-}
-
-.alert-validate::after {
-  content: "";
-  font-family: FontAwesome;
-  display: block;
-  position: absolute;
-  color: #c80000;
-  font-size: 15px;
-  top: 50%;
-  -webkit-transform: translateY(-50%);
-  -moz-transform: translateY(-50%);
-  -ms-transform: translateY(-50%);
-  -o-transform: translateY(-50%);
-  transform: translateY(-50%);
-  right: 8px;
-}
-
-.alert-validate:hover:before {
-  visibility: visible;
-  opacity: 1;
-}
-
 @media (max-width: 992px) {
   .alert-validate::before {
     visibility: visible;
@@ -585,11 +565,23 @@ INDEX  PAGE
 
 #search-button {
   padding: 12px;
+  color: white;
+  margin-top: 0px;
+}
+
+#search-button img {
+  margin-right: 10px;
 }
 
 #search-icon {
   height: 20px;
   width: 20px;
+}
+
+.noresult-section p {
+  font-size: 25px;
+  margin-top: 60px;
+  margin-bottom: 60px;
 }
 
 .books-container a:hover {
@@ -607,9 +599,21 @@ INDEX  PAGE
 .book-list-section .books-container {
   display: flex;
   width: 100%;
-  background-color: white;
-  margin-left: 2%;
   flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.book-list-section .books-container a {
+  width: 240px;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.book-item {
+  margin-left: 0px;
 }
 
 @media screen and (min-width: 547px) {
@@ -617,13 +621,16 @@ INDEX  PAGE
     margin-right: 20px;
     margin-bottom: 20px;
     margin-top: 8px;
-    width: 240px;
     height: auto;
     box-shadow: 0 15px 20px rgba(0, 0, 0, 0.3);
   }
 }
 .index-average-rating i {
   color: #ffca28;
+}
+
+.index-average-rating img {
+  height: 25px;
 }
 
 .book-title-section {
@@ -648,7 +655,8 @@ INDEX  PAGE
 
 .book-autor-section p {
   text-decoration: none;
-  color: black;
+  color: #acb3b4;
+  font-size: 14px;
 }
 
 .book-image-section img, .book .book-image img {
@@ -732,7 +740,7 @@ INDEX  PAGE
     width: 240px;
     height: auto;
     box-shadow: 0 15px 20px rgba(0, 0, 0, 0.3);
-    margin-left: 120px;
+    margin-left: 0px;
     height: auto;
   }
 }
@@ -745,13 +753,14 @@ BOOK PAGE
   width: 100%;
   margin-top: 60px;
   margin-bottom: 60px;
-  height: 500px;
+  height: 611px;
 }
 
 .book-information-section .information-container {
   width: 80%;
   margin: auto;
   height: 100%;
+  padding-top: 14px;
   border-radius: 10px;
   box-shadow: 0 15px 20px rgba(0, 0, 0, 0.3);
 }
@@ -768,10 +777,12 @@ BOOK PAGE
   margin-bottom: 15px;
 }
 
-.rating-section img {
-  width: 40px;
-  height: 40px;
+.rating-section i {
+  font-size: 30px;
+  width: 50px;
+  height: 50px;
   margin-right: 10px;
+  color: #ffca28;
 }
 
 .book .book-image {
@@ -836,6 +847,11 @@ BOOK PAGE
 
 .reviewer-comment p {
   word-wrap: break-word;
+}
+
+.reviewer-rating {
+  color: #ffca28;
+  padding-top: 4px;
 }
 
 .rating-selection-section {
