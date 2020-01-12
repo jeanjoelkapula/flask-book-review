@@ -49,7 +49,6 @@ def index(page):
             #if rating is not None:
         pagination = paginate(page_count, page)
         index_end = time.time()
-        print('index duration', (index_end - index_start))
         return render_template('index.html', books = books, ratings = ratings, current_page = page, pagination = pagination, page_count = page_count, isSearch = False)
     return redirect(url_for('login'))
 
@@ -100,7 +99,6 @@ def book(bookid):
         db.commit()
         onsite_average_rating = get_onsite_average_rating(bookid)
         details = get_goodreads_book_details(book.isbn)
-        print(onsite_average_rating)
         if details is None:
             goodreads_average_rating = 0
         else:
@@ -110,7 +108,6 @@ def book(bookid):
             average_rating = round (((onsite_average_rating + goodreads_average_rating) / 2), 1)
         elif ((onsite_average_rating == 0) or (goodreads_average_rating == 0)):
             average_rating = round ((onsite_average_rating + goodreads_average_rating), 1)
-        print(f'onsite: {onsite_average_rating} goodreads:{goodreads_average_rating}')
         return render_template('book.html', book = book, reviews = reviews, average_rating = onsite_average_rating, goodreads_reviews = details["work_reviews_count"], goodreads_rating=details["average_rating"]) 
     return redirect(url_for('login'))
 
@@ -216,7 +213,6 @@ def get_onsite_average_rating(bookid):
     stars_3 = stars.stars_3
     stars_4 = stars.stars_4
     stars_5 = stars.stars_5
-    print(f'stars_1: {stars_1} stars_2:{stars_2} stars_3:{stars_3} stars_4:{stars_4} stars_5:{stars_5}')
     sum_result = (stars_1 + stars_2 + stars_3 + stars_4 + stars_4)
     if (sum_result != 0):
         onsite_average_rating = ((5 * stars_5) + (4 * stars_4) + (3 * stars_3) + (2 * stars_2) + (1 * stars_1)) / (stars_1 + stars_2 + stars_3 + stars_4 + stars_5)
@@ -254,7 +250,7 @@ def paginate(n, page):
     return pagination
 
 
-app.secret_key = r"b'\xc7\xba\xde>?\x1e\xfd\x10\xc7\xf6\xf0\x11?\xec\xd2S\x9b\xe9\xaby{\x19\xbe-'"
+app.secret_key = os.getenv("SECRET_KEY")
 if __name__ == "__main__":
     app.run()
 
