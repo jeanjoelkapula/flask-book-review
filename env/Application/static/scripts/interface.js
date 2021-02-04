@@ -56,15 +56,16 @@ function select_star() {
 window.onscroll = function () {
   var header = document.querySelector('#welcome-header');
   var navbar = document.querySelector("#mainNav");
-  var isOut = isOutOfBound(header);
-  var bouncing = header.getBoundingClientRect();
-  if (bouncing.top <= -378) {
-    console.log('out of bound');
-    navbar.style.background = 'rgba(33, 37, 41, 0.7)';
-    console.log(navbar);
-  }
-  else {
-    navbar.style.background = 'transparent';
+  if (header != null) {
+    var isOut = isOutOfBound(header);
+    var bouncing = header.getBoundingClientRect();
+    if (bouncing.top <= -378) {
+      navbar.style.background = 'rgba(33, 37, 41, 0.7)';
+      console.log(navbar);
+    }
+    else {
+      navbar.style.background = 'transparent';
+    }
   }
 }
 

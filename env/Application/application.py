@@ -98,14 +98,11 @@ def book(bookid):
         reviews = db.execute("SELECT A.firstname, A.lastname, R.rating, R.review FROM review R INNER JOIN useraccount A ON R.userid = A.userid WHERE bookid = :bookid;", {"bookid":bookid}).fetchall()
         db.commit()
         onsite_average_rating = get_onsite_average_rating(bookid)
-        details = get_goodreads_book_details(book.isbn)
-        if details is None:
-            goodreads_average_rating = 0
-        else:
-            goodreads_average_rating = float(details["average_rating"])
-
-        print(onsite_average_rating)
-        return render_template('book.html', book = book, reviews = reviews, average_rating = onsite_average_rating, goodreads_reviews = details["work_reviews_count"], goodreads_rating=details["average_rating"]) 
+        #details = get_goodreads_book_details(book.isbn)
+        #good_reads_api service has been discontinued
+        goodreads_average_rating = 0
+        print('readched book')
+        return render_template('book.html', book = book, reviews = reviews, average_rating = onsite_average_rating, goodreads_reviews = 0, goodreads_rating=0) 
     return redirect(url_for('login'))
 
 @app.route('/review', methods = ["POST"])
@@ -151,7 +148,9 @@ def get_search_result(search, page):
 
         for book in books:
             onsite_average_rating = get_onsite_average_rating(book.bookid)
-            details = get_goodreads_book_details(book.isbn)
+            #details = get_goodreads_book_details(book.isbn)
+            #api service has been discontinued
+            details = None
             if details is None:
                 goodreads_average_rating = 0
             else:
